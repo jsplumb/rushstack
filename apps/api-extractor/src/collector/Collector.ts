@@ -514,14 +514,8 @@ export class Collector {
 
       // If the idealNameForEmit happens to be the same as one of the exports, then we're safe to use that...
       if (entity.exportNames.has(idealNameForEmit)) {
-        // ...except that if it conflicts with a global name, then the global name wins
-        if (!this.globalVariableAnalyzer.hasGlobalName(idealNameForEmit)) {
-          // ...also avoid "default" which can interfere with "export { default } from 'some-module;'"
-          if (idealNameForEmit !== 'default') {
-            entity.nameForEmit = idealNameForEmit;
-            continue;
-          }
-        }
+          entity.nameForEmit = idealNameForEmit;
+          continue;
       }
 
       // Generate a unique name based on idealNameForEmit
@@ -529,11 +523,7 @@ export class Collector {
       let nameForEmit: string = idealNameForEmit;
 
       // Choose a name that doesn't conflict with usedNames or a global name
-      while (
-        nameForEmit === 'default' ||
-        usedNames.has(nameForEmit) ||
-        this.globalVariableAnalyzer.hasGlobalName(nameForEmit)
-      ) {
+      while (usedNames.has(nameForEmit)) {
         nameForEmit = `${idealNameForEmit}_${++suffix}`;
       }
       entity.nameForEmit = nameForEmit;
